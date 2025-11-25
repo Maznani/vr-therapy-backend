@@ -24,23 +24,30 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
 
+        // 1. Use fullName directly from the request
+        // This prevents the "Unknown Therapist" issue on the frontend
+        String combinedName = request.getFullName();
+
         User user = User.builder()
-                .name(request.getFullName())
+                .name(combinedName) // Use the combined name for the User table
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
 
+        // 2. Save User (Generates the ID)
         User savedUser = repository.save(user);
 
         // 3. Auto-create Therapist Profile if Role is THERAPIST
         if (request.getRole() == Role.THERAPIST) {
             
             Therapist therapist = Therapist.builder()
-                    // --- THE FIX IS HERE: (long) ---
+                    // FIX: Cast Integer ID from User to Long for Therapist
                     .id((long) savedUser.getId()) 
-                    // -------------------------------
-                    .fullName(request.getFullName()) 
+                    
+                    // FIX: Use the combined name here too so the profile has a name
+                    .fullName(combinedName) 
+                    
                     .specialization("General Therapy")
                     .experienceYears(0)
                     .rating(5.0) 

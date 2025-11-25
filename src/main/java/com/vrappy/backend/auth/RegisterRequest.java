@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class RegisterRequest {
-    private String fullName;  // <-- FIXED
+
+    private String fullName;
     private String email;
     private String password;
     private Role role;
